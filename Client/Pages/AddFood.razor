@@ -1,0 +1,54 @@
+﻿@page "/addperson"
+@using GreenPantryApp.Shared
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+<h2>Add Food</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="GroceryItem"> Food Item *</label>
+            <input form="GroceryItem" class="form-control" @bind="@food.GroceryItem" />
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="PurchaseDate"> Last Name *</label>
+            <input form="PurchaseDate" class="form-control" @bind="@food.PurchaseDate" />
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="ExpirationDate"> Email *</label>
+            <input form="ExpirationDate" class="form-control" @bind="@food.ExpirationDate" />
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <input type="button" class="btn btn-primary" @onclick="@Save" value="Save" />
+            <input type="button" class="btn" @onclick="@Cancel" value="Cancel" />
+        </div>
+    </div>
+</div>
+@code {
+    GroceryViewModel food = new GroceryViewModel();
+    protected override async Task OnInitializedAsync()
+    {
+    }
+    protected async Task Save()
+    {
+        var response = await Http.PostAsJsonAsync("api/Person", @food);
+        GroceryViewModel personResponse = await response.Content.ReadFromJsonAsync<GroceryViewModel>();
+        if (personResponse?.Id > 0)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Saved Successfully!");
+            NavigationManager.NavigateTo("groceryList");
+        }
+    }
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("groceryList");
+    }
+}

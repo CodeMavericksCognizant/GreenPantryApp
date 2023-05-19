@@ -1,0 +1,44 @@
+﻿@page "/grocerylist"
+@using GreenPantryApp.Shared
+@inject HttpClient _httpClient
+<h1>Grocery Detail</h1>
+<div>
+    <a href="/addfood"> Add New Food Item</a>
+    @if (groceryList != null)
+    {
+        <table class="table-bordered">
+            <thead>
+            <tr>
+                <th width = "40%">Grocery Item</th>
+                <th width = "30%">Purchase Date</th>
+                <th width = "30%">Expiration Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var p in groceryList)
+            {
+                <tr>
+                    <td>
+                        @p.GroceryItem
+                    </td>
+                    <td>@p.PurchaseDate</td>
+                    <td>@p.ExpirationDate</td>
+                    <td>
+                        <a href="/editfood/@p.Id">Edit</a> |
+                        <a href="/deletefood/@p.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>
+@code {
+    List<GroceryViewModel> groceryList = new List<GroceryViewModel>();
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await _httpClient.GetAsync("api/food");
+        response.EnsureSuccessStatusCode();
+        groceryList = await response.Content.ReadFromJsonAsync<List<GroceryViewModel>>();
+    }
+}

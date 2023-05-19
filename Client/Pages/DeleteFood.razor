@@ -1,0 +1,57 @@
+﻿@page "/deleteperson/{Id}"
+@using GreenPantryApp.Shared
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+<h2>Delete Person</h2>
+@if (food != null)
+{
+    <p>Are you sure you want to delete this food item with Name: <b>@food.GroceryItem</b></p>
+    <div class="row">
+        <table class="table">
+            <tr>
+                <td>Grocery Item</td>
+                <td>@food.GroceryItem</td>
+            </tr>
+            <tr>
+                <td>Purchase Date</td>
+                <td>@food.PurchaseDate</td>
+            </tr>
+            <tr>
+                <td>Expiration Date</td>
+                <td>@food.ExpirationDate</td>
+            </tr>
+        </table>
+    </div>
+}
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <input type="button" class="btn btn-primary" @onclick="@Delete" value="Delete" />
+            <input type="button" class="btn" @onclick="@Cancel" value="Cancel" />
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    GroceryViewModel food = new GroceryViewModel();
+    protected override async Task OnInitializedAsync()
+    {
+        food = await Http.GetFromJsonAsync<GroceryViewModel>("api/food/" + Id);
+    }
+    protected async Task Delete()
+    {
+        var response = await Http.DeleteAsync("api/Food/" + Id);
+        bool deleteResponse = await response.Content.ReadFromJsonAsync<bool>();
+        if (deleteResponse)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Deleted Successfully!");
+            NavigationManager.NavigateTo("grocerylist");
+        }
+    }
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("grocerylist");
+    }
+}
