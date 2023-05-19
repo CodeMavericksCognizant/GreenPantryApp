@@ -2,12 +2,57 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using GreenPantryApp.Shared
+@using System.Net
 @attribute [Authorize]
-@inject HttpClient Http
+@inject HttpClient _httpClient
 
 
-<h3>Groceries</h3>
 
+<PageTitle>Grocery List</PageTitle>
+<h3>Grocery List</h3>
+
+
+
+@if (groceries == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Expiration Date</th>
+            <th>Quantity</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var grocery in groceries)
+        {
+            <tr>
+                <td>@grocery.Name</td>
+                <td>@grocery.ExpiryDate.ToShortDateString()</td>
+                <td>@grocery.Quantity</td>
+
+            </tr>
+        }
+        </tbody>
+    </table>
+}
 @code {
+    private GroceryItem[]? groceries;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            groceries = await _httpClient.GetFromJsonAsync<GroceryItem[]>("GroceryItem");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+    }
 
 }

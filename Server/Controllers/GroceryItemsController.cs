@@ -7,9 +7,13 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GreenPantryApp.Server.Data;
 using GreenPantryApp.Server.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GreenPantryApp.Server.Controllers
 {
+    [Authorize]
+    [ApiController]
+    [Route("[controller]")]
     public class GroceryItemsController : Controller
     {
         private readonly GroceryDbContext _context;
