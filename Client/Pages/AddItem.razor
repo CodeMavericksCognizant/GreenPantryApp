@@ -1,0 +1,64 @@
+﻿@page "/additem"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using GreenPantryApp.Shared
+@using System.Net
+@attribute [Authorize]
+@inject HttpClient _httpClient
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+
+<h3>Add Item</h3>
+
+
+<h4>GroceryItem</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="Name"> Name</label>
+            <input form="Name" class="form-control" @bind="@_food.Name" />
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="ExpiryDate"> Expiration Date</label>
+            <input form="ExpiryDate" class="form-control" @bind="@_food.ExpiryDate" />
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="Quantity"> Quantity</label>
+            <input form="Quantity" class="form-control" @bind="@_food.Quantity" />
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <input type="button" class="btn btn-primary" @onclick="@Save" value="Save" />
+        </div>
+    </div>
+</div>
+<div>
+    <a asp-action="groceryitems">Back to List</a>
+</div>
+
+
+@code {
+    GroceryItem _food = new GroceryItem();
+
+    protected async Task Save()
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/groceryitems", @_food);
+        GroceryItem trueResponse = await response.Content.ReadFromJsonAsync<GroceryItem>();
+        if (trueResponse != null)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Saved Successfully!");
+            NavigationManager.NavigateTo("groceryitems");
+        }
+
+    }
+
+}

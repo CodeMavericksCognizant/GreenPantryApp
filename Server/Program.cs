@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 
-namespace GreenPantryApp.Server
+namespace GreenPantryApp
 {
     public class Program
     {
