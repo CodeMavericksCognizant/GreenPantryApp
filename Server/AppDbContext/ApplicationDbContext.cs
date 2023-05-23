@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using GreenPantryApp.Server.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 
 namespace GreenPantryApp.Server.AppDbContext
@@ -8,3 +9,4 @@ namespace GreenPantryApp.Server.AppDbContext
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
         public DbSet<Food> Foods { get; set; }
     }
+}
