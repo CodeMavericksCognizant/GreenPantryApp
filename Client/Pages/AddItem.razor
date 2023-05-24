@@ -42,12 +42,13 @@
     </div>
 </div>
 <div>
-    <a asp-action="groceryitems">Back to List</a>
+    <a asp-action="groceryitems"><input type="button" class="btn btn-primary" @onclick="@GoBack" value="Back to List" /></a>
 </div>
 
 
 @code {
     GroceryItem _food = new GroceryItem();
+
 
     protected async Task Save()
     {
@@ -58,6 +59,12 @@
             await JsRuntime.InvokeVoidAsync("alert", "Saved Successfully!");
             NavigationManager.NavigateTo("groceryitems");
         }
+
+    }
+    protected void GoBack()
+    {
+
+        NavigationManager.NavigateTo("groceryitems");
 
     }
 

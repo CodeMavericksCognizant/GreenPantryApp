@@ -1,6 +1,55 @@
-﻿@page "/edititem"
-<h3>EditItem</h3>
-
+﻿﻿@page "/editfood/{Id}"
+@using GreenPantryApp.Shared
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+<h2>Edit Item</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="Name"> Name</label>
+            <input form="Name" class="form-control" @bind="@_food.Name" />
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="ExpiryDate"> Expiration Date</label>
+            <input form="ExpiryDate" class="form-control" @bind="@_food.ExpiryDate" />
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="Quantity"> Quantity</label>
+            <input form="Quantity" class="form-control" @bind="@_food.Quantity" />
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <input type="button" class="btn btn-primary" @onclick="@Save" value="Save" />
+        </div>
+    </div>
+</div>
 @code {
-    
-}
+    [Parameter]
+    public string Id { get; set; }
+    GroceryItem food = new GroceryItem();
+    protected override async Task OnInitializedAsync()
+    {
+        food = await Http.GetFromJsonAsync<GroceryItem>("api/groceryitems/" + Id);
+    }
+    protected async Task Save()
+    {
+        var response = await Http.PutAsJsonAsync("api/groceryitems/" + Id, @food);
+        bool foodResponse = await response.Content.ReadFromJsonAsync<bool>();
+        if (foodResponse)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Updated Successfully!");
+            NavigationManager.NavigateTo("groceryitems");
+        }
+    }
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("groceryitems");
+    }
