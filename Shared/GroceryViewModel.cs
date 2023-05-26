@@ -22,14 +22,14 @@ public class GroceryViewModel{
     }
     [Required]
     [Display(Name = "Purchase date")]
-    public string PurchaseDate
+    public DateTime PurchaseDate
     {
         get;
         set;
     }
     [Required]
     [Display(Name = "Expiration Date")]
-    public string ExpirationDate
+    public DateTime ExpirationDate
     {
         get;
         set;

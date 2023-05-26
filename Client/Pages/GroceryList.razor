@@ -37,7 +37,7 @@
     List<GroceryViewModel> groceryList = new List<GroceryViewModel>();
     protected override async Task OnInitializedAsync()
     {
-        var response = await _httpClient.GetAsync("api/food");
+        var response = await _httpClient.GetAsync("api/Foods");
         response.EnsureSuccessStatusCode();
         groceryList = await response.Content.ReadFromJsonAsync<List<GroceryViewModel>>();
     }

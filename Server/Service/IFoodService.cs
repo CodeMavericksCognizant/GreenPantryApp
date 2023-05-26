@@ -8,7 +8,7 @@ namespace GreenPantryApp.Server.Service
         Task<Food> AddFood(Food food);
         Task<bool> UpdateFood(int id, Food food);
         Task<bool> DeleteFood(int id);
-        Task<List<Person>> GetAllFoods();
-        Task<Person> GetFood(int id);
+        Task<List<Food>> GetAllFoods();
+        Task<Food> GetFood(int id);
     }
 }

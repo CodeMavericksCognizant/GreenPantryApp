@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GreenPantryApp.Server.Repository
 {
-    public class PersonRepository : IRepository<Food>
+    public class FoodRepository : IRepository<Food>
     {
         ApplicationDbContext _dbContext;
-        public PersonRepository(ApplicationDbContext applicationDbContext)
+        public FoodRepository(ApplicationDbContext applicationDbContext)
         {
             _dbContext = applicationDbContext;
         }

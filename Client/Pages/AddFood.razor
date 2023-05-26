@@ -1,8 +1,13 @@
-﻿@page "/addperson"
+﻿@page "/addfood"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using GreenPantryApp.Shared
-@inject HttpClient Http
+@using System.Net
+@attribute [Authorize]
+@inject HttpClient _httpClient
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
+
 <h2>Add Food</h2>
 <div class="row">
     <div class="col-md-6">
@@ -13,13 +18,13 @@
     </div>
     <div class="col-md-6">
         <div class="form-group">
-            <label for="PurchaseDate"> Last Name *</label>
+            <label for="PurchaseDate"> Purchase Date *</label>
             <input form="PurchaseDate" class="form-control" @bind="@food.PurchaseDate" />
         </div>
     </div>
     <div class="col-md-6">
         <div class="form-group">
-            <label for="ExpirationDate"> Email *</label>
+            <label for="ExpirationDate"> Expiration Date *</label>
             <input form="ExpirationDate" class="form-control" @bind="@food.ExpirationDate" />
         </div>
     </div>
@@ -39,7 +44,7 @@
     }
     protected async Task Save()
     {
-        var response = await Http.PostAsJsonAsync("api/Person", @food);
+        var response = await _httpClient.PostAsJsonAsync("api/Foods", @food);
         GroceryViewModel personResponse = await response.Content.ReadFromJsonAsync<GroceryViewModel>();
         if (personResponse?.Id > 0)
         {

@@ -1,8 +1,11 @@
 using GreenPantryApp.Server.Data;
 using GreenPantryApp.Server.Models;
+using GreenPantryApp.Server.Repository;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using System;
+using GreenPantryApp.Server.Service;
 
 namespace GreenPantryApp.Server
 {
@@ -17,7 +20,6 @@ namespace GreenPantryApp.Server
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
             builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
@@ -27,6 +29,8 @@ namespace GreenPantryApp.Server
             builder.Services.AddAuthentication()
                 .AddIdentityServerJwt();
 
+            builder.Services.AddTransient<IRepository<Food>, FoodRepository>();
+            builder.Services.AddTransient<IFoodService, FoodService>();
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
 
