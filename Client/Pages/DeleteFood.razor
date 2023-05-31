@@ -1,4 +1,4 @@
-﻿@page "/deleteperson/{Id}"
+﻿@page "/deletefood/{Id}"
 @using GreenPantryApp.Shared
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
@@ -38,11 +38,11 @@
     GroceryViewModel food = new GroceryViewModel();
     protected override async Task OnInitializedAsync()
     {
-        food = await Http.GetFromJsonAsync<GroceryViewModel>("api/food/" + Id);
+        food = await Http.GetFromJsonAsync<GroceryViewModel>("api/Foods/" + Id);
     }
     protected async Task Delete()
     {
-        var response = await Http.DeleteAsync("api/Food/" + Id);
+        var response = await Http.DeleteAsync("api/Foods/" + Id);
         bool deleteResponse = await response.Content.ReadFromJsonAsync<bool>();
         if (deleteResponse)
         {

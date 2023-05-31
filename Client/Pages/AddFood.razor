@@ -39,13 +39,11 @@
 </div>
 @code {
     GroceryViewModel food = new GroceryViewModel();
-    protected override async Task OnInitializedAsync()
-    {
-    }
+ 
     protected async Task Save()
     {
         var response = await _httpClient.PostAsJsonAsync("api/Foods", @food);
-        GroceryViewModel personResponse = await response.Content.ReadFromJsonAsync<GroceryViewModel>();
+        GroceryViewModel personResponse = await response.Content.ReadFromJsonAsync<GroceryViewModel>() ?? throw new InvalidOperationException();
         if (personResponse?.Id > 0)
         {
             await JsRuntime.InvokeVoidAsync("alert", "Saved Successfully!");

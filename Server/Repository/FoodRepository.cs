@@ -1,5 +1,4 @@
 ﻿using GreenPantryApp.Server.Data;
-using System;
 using GreenPantryApp.Server.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +6,7 @@ namespace GreenPantryApp.Server.Repository
 {
     public class FoodRepository : IRepository<Food>
     {
-        ApplicationDbContext _dbContext;
+        private readonly ApplicationDbContext _dbContext;
         public FoodRepository(ApplicationDbContext applicationDbContext)
         {
             _dbContext = applicationDbContext;

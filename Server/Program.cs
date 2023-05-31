@@ -19,6 +19,8 @@ namespace GreenPantryApp.Server
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
+            builder.Services.AddTransient<IRepository<Food>, FoodRepository>();
+            builder.Services.AddTransient<IFoodService, FoodService>();
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
             builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -28,9 +30,16 @@ namespace GreenPantryApp.Server
 
             builder.Services.AddAuthentication()
                 .AddIdentityServerJwt();
-
-            builder.Services.AddTransient<IRepository<Food>, FoodRepository>();
-            builder.Services.AddTransient<IFoodService, FoodService>();
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    policy =>
+                    {
+                        policy.AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
+            });
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
 
@@ -55,7 +64,7 @@ namespace GreenPantryApp.Server
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseCors();
             app.UseIdentityServer();
             app.UseAuthentication();
             app.UseAuthorization();

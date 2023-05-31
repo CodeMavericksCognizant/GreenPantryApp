@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using GreenPantryApp.Server.Data;
 using GreenPantryApp.Server.Models;
 using GreenPantryApp.Server.Service;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GreenPantryApp.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class FoodsController : ControllerBase
