@@ -13,13 +13,13 @@
     </div>
     <div class="col-md-6">
         <div class="form-group">
-            <label for="PurchaseDate"> Last Name *</label>
+            <label for="PurchaseDate"> Purchase Date *</label>
             <input form="PurchaseDate" class="form-control" @bind="@food.PurchaseDate" />
         </div>
     </div>
     <div class="col-md-6">
         <div class="form-group">
-            <label for="ExpirationDate"> Email *</label>
+            <label for="ExpirationDate"> Expiration Date *</label>
             <input form="ExpirationDate" class="form-control" @bind="@food.ExpirationDate" />
         </div>
     </div>
@@ -38,7 +38,7 @@
     GroceryViewModel food = new GroceryViewModel();
     protected override async Task OnInitializedAsync()
     {
-        food = await Http.GetFromJsonAsync<GroceryViewModel>("api/food/" + Id);
+        food = await Http.GetFromJsonAsync<GroceryViewModel>("api/Foods/" + Id);
     }
     protected async Task Save()
     {
