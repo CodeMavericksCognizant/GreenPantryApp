@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GreenPantryApp.Server.Models
 {
-    [Table("Food", Schema = "dbo")]
     public class Food
     {
         [Required]
