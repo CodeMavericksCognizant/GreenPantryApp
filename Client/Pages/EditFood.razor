@@ -42,7 +42,7 @@
     }
     protected async Task Save()
     {
-        var response = await Http.PutAsJsonAsync("api/Food/" + Id, @food);
+        var response = await Http.PutAsJsonAsync("api/Foods/" + Id, @food);
         bool foodResponse = await response.Content.ReadFromJsonAsync<bool>();
         if (foodResponse)
         {
