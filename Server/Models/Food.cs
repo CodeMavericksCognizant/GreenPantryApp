@@ -8,7 +8,9 @@ namespace GreenPantryApp.Server.Models
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
+        [Required]
+        [ForeignKey("AspNetUsers")]
+        public string UserId { get; set; }
         [Required] public string GroceryItem { get; set; }
         [Required] public DateTime PurchaseDate { get; set; }
         [Required] public DateTime ExpirationDate { get; set; }

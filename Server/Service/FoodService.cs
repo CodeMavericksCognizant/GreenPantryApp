@@ -1,5 +1,7 @@
-﻿using GreenPantryApp.Server.Models;
+﻿using GreenPantryApp.Server.Controllers;
+using GreenPantryApp.Server.Models;
 using GreenPantryApp.Server.Repository;
+using System.Security.Claims;
 using static GreenPantryApp.Server.Models.Food;
 
 namespace GreenPantryApp.Server.Service
@@ -7,12 +9,16 @@ namespace GreenPantryApp.Server.Service
     public class FoodService : IFoodService
     {
         private readonly IRepository<Food> _food;
-        public FoodService(IRepository<Food> food)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public FoodService(IRepository<Food> food, IHttpContextAccessor httpContextAccessor)
         {
             _food = food;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<Food> AddFood(Food food)
         {
+            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            food.UserId = userId;
             return await _food.CreateAsync(food);
         }
         public async Task<bool> UpdateFood(int id, Food food)
@@ -36,11 +42,17 @@ namespace GreenPantryApp.Server.Service
         }
         public async Task<List<Food>> GetAllFoods()
         {
-            return await _food.GetAllAsync();
+            var items = await _food.GetAllAsync();
+            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return (List<Food>)items.Where(o => o.UserId == userId).ToList();
         }
         public async Task<Food> GetFood(int id)
         {
             return await _food.GetByIdAsync(id);
         }
+
     }
+
+
+
 }

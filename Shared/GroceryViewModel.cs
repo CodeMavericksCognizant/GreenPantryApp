@@ -13,6 +13,11 @@ public class GroceryViewModel{
         get;
         set;
     }
+    public string UserId
+    {
+        get;
+        set;
+    }
     [Required]
     [Display(Name = "Grocery Item")]
     public string GroceryItem

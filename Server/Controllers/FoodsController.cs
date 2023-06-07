@@ -9,14 +9,17 @@ using GreenPantryApp.Server.Data;
 using GreenPantryApp.Server.Models;
 using GreenPantryApp.Server.Service;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace GreenPantryApp.Server.Controllers
 {
+    
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class FoodsController : ControllerBase
     {
+        
         private readonly IFoodService _foodService;
 
         public FoodsController(IFoodService foodService)
@@ -55,5 +58,7 @@ namespace GreenPantryApp.Server.Controllers
             await _foodService.UpdateFood(id, Object);
             return true;
         }
+
+
     }
 }

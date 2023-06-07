@@ -4,5 +4,6 @@ namespace GreenPantryApp.Server.Models
 {
     public class ApplicationUser : IdentityUser
     {
+
     }
 }

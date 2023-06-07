@@ -21,6 +21,7 @@ namespace GreenPantryApp.Server
                 options.UseSqlServer(connectionString));
             builder.Services.AddTransient<IRepository<Food>, FoodRepository>();
             builder.Services.AddTransient<IFoodService, FoodService>();
+            builder.Services.AddHttpContextAccessor();
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
             builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
