@@ -1,6 +1,7 @@
 ﻿@page "/grocerylist"
 @using GreenPantryApp.Shared
 @inject HttpClient _httpClient
+@inject IJSRuntime JsRuntime
 <h1>Grocery Detail</h1>
 <div>
     <a href="/addfood"> Add New Food Item</a>
@@ -24,8 +25,9 @@
                     <td>@p.PurchaseDate</td>
                     <td>@p.ExpirationDate</td>
                     <td>
-                        <a href="/editfood/@p.Id">Edit</a class="bi bi-pencil-square"> |
-                        <a href="/deletefood/@p.Id">Delete</a class="bi bi-trash">
+                        <a href="/editfood/@p.Id">Edit</a> |
+                        <a href="/deletefood/@p.Id">Delete</a>
+                        <a href="/shoppinglist/@p.Id">Move to Shopping List</a>
                     </td>
                 </tr>
             }
@@ -40,5 +42,22 @@
         var response = await _httpClient.GetAsync("api/Foods");
         response.EnsureSuccessStatusCode();
         groceryList = await response.Content.ReadFromJsonAsync<List<GroceryViewModel>>();
+        DateTime temp = DateTime.Now;
+        string message="";
+        foreach(var g in groceryList)
+        {
+            var tempDays = (g.ExpirationDate-temp).Days;
+            if ( tempDays<=3)
+            {
+                message+= "\n"+g.GroceryItem + " expiring in " + tempDays + " days!";
+
+            }
+        }
+        if (message.Length > 1)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", message);
+        }
     }
+
+
 }
