@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace GreenPantryApp.Server.Data.Migrations
+namespace GreenPantryApp.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230530191545_Intial")]
-    partial class Intial
+    [Migration("20230531195258_first")]
+    partial class first
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -251,7 +251,7 @@ namespace GreenPantryApp.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Food", "dbo");
+                    b.ToTable("Foods");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

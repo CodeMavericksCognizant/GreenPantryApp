@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace GreenPantryApp.Server.Data.Migrations
+namespace GreenPantryApp.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class Intial : Migration
+    public partial class second : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
