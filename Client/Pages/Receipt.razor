@@ -1,0 +1,106 @@
+﻿@page "/receipt"
+@using System.IO
+@using Newtonsoft.Json
+@using Mindee
+@using Mindee.Parsing
+@inject HttpClient Http
+@inject IJSRuntime JsRuntime
+
+<h1>Receipt OCR</h1>
+
+<!-- Create an input element that allows users to select receipt images -->
+<InputFile accept="image/*" OnChange="@OnFileSelected" required />
+
+<!-- Create a button element that allows users to upload receipt images -->
+<button type="button" class="btn btn-primary" @onclick="OnFileUpload">Upload</button>
+
+<!-- Create a div that displays the extracted data from the receipt image -->
+<div id="result">
+     @if (result != null)
+    {
+        <p>Yay</p>
+      
+    }
+</div>
+
+@code {
+    private readonly string _apiKey = "f120c44f2a4223caad80a4cf96098978";
+
+
+    private MindeeClient _client;
+
+
+    private IBrowserFile file;
+
+
+    private dynamic result;
+
+
+    private async void OnFileSelected(InputFileChangeEventArgs e)
+    {
+
+        file = e.File;
+        await JsRuntime.InvokeVoidAsync("alert", "Successful upload.");
+    }
+
+    // Define an async method that handles the file upload event
+    private async Task OnFileUpload()
+    {
+        // Check if the file is not null and has a valid size
+        if (file != null && file.Size > 0)
+        {
+            try
+            {
+                var tempPath = Path.Combine("wwwroot", "images");
+                if (!Directory.Exists(tempPath))
+                {
+                    Directory.CreateDirectory(tempPath);
+                }
+                var filePath = Path.Combine("wwwroot", "images" , file.Name);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.OpenReadStream().CopyToAsync(stream);
+                }
+                await JsRuntime.InvokeVoidAsync("alert", "Copied.");
+                // Call the Mindee Receipt OCR API with the file path
+                result = await CallMindeeReceiptOcrApi(filePath);
+                // Trigger a UI update
+                StateHasChanged();
+            }
+            catch (Exception exp)
+            {
+                Console.WriteLine(exp.Message + " " + exp.StackTrace);
+            }
+    }
+        else
+        {
+            // Display an error message in an alert box
+            await JsRuntime.InvokeVoidAsync("alert", "Invalid file.");
+        }
+    }
+
+    // Define an async method that calls the Mindee Receipt OCR API with a file path
+    private async Task<dynamic> CallMindeeReceiptOcrApi(string filePath)
+    {
+
+        MindeeClient mindeeClient = MindeeClientInit.Create(_apiKey);
+
+        CustomEndpoint myEndpoint = new CustomEndpoint(
+            endpointName: "expense_receipts",
+            accountName: "mindee",
+            version: "5.0"
+        );
+
+        var documentParsed = await mindeeClient
+            .LoadDocument(new FileInfo(filePath))
+            .ParseAsync(myEndpoint);
+
+        Console.WriteLine(documentParsed.ToString());
+        
+        var result = JsonConvert.DeserializeObject<dynamic>(documentParsed.Inference.DocumentPrediction.ToString());
+        // Return the result object
+        return result;
+
+    }
+}
