@@ -1,0 +1,148 @@
+﻿@page "/recipesearch/{id?}"
+@using System.IO
+
+@using System.Text.Json
+@using System.Net.Http.Headers
+@using System.Net.Http
+@using System.Dynamic
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using GreenPantryApp.Shared
+@using System.Net
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject HttpClient Http
+@inject IJSRuntime JsRuntime
+
+<style>
+	.container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+    .card {
+        width: 400px;
+    }
+
+    .card-img-top {
+        height: 300px;
+        object-fit: cover;
+    }
+
+	hr {
+		border: none;
+		height: 5px;
+		background-color: darkgreen;
+		margin: 20px 0;
+	}
+</style>
+<div class="container">
+<h2>Recipe Search</h2>
+<hr/>
+	<h4>Either enter an ingredient to search or search with grocery item name</h4>
+    <div class="col-md-6">
+        <div class="form-group">
+            <input form="search" class="form-control" @bind="@searchText" placeholder="Enter an ingredient"/>
+        </div>
+    </div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <input type="button" class="btn btn-primary" @onclick="@GetRecipe" value="Search" />
+        </div>
+    </div>
+</div>
+
+@if (recipes != null)
+{
+		<hr />
+	@foreach (var rep in recipes)
+	{
+		<div class="card">
+			<img src="@rep.image" class="card-img-top" alt="Recipe Image">
+			<div class="card-body">
+				<h5 class="card-title">@rep.label</h5>
+				@foreach (var ing in rep.ingredientLines)
+				{
+					<p class="card-text">@ing</p>
+				}
+				
+			</div>
+		</div>
+	}
+}
+</div>
+
+
+@code {
+	[Parameter]
+	public string Id { get; set; }
+	GroceryViewModel food = new GroceryViewModel();
+	private string searchText;
+	private Recipe[] recipes;
+
+	private class Recipe
+	{
+		public string label { get; set; }
+		public string image { get; set; }
+		public string[] ingredientLines { get; set; }
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (String.IsNullOrEmpty(Id))
+		{
+			return;
+		}
+		food = await Http.GetFromJsonAsync<GroceryViewModel>("api/Foods/" + Id);
+	}
+
+	private async void GetRecipe()
+	{
+		string temp;
+		if (String.IsNullOrEmpty(searchText))
+		{
+			if (String.IsNullOrEmpty(Id))
+			{
+				await JsRuntime.InvokeVoidAsync("alert", "Enter an ingredient to search!");
+				return;
+			}
+			else
+			{
+				temp = food.GroceryItem;
+			}
+		}
+		else
+		{
+			temp = searchText;
+		}
+		var stringurl = "https://edamam-recipe-search.p.rapidapi.com/search?q=" + temp;
+		using (var client = new HttpClient())
+		{
+			using (var request = new HttpRequestMessage(new HttpMethod("GET"), stringurl))
+
+			{
+				request.Headers.TryAddWithoutValidation("X-RapidAPI-Key", "eca61a47d7msh951cf7688782a57p106df3jsna5f3e97cfc2a");
+				request.Headers.TryAddWithoutValidation("X-RapidAPI-Host", "edamam-recipe-search.p.rapidapi.com");
+
+				using (var response = await client.SendAsync(request))
+				{
+					response.EnsureSuccessStatusCode();
+					var responseContent = await response.Content.ReadAsStringAsync();
+					var parsedResponse = JsonDocument.Parse(responseContent).RootElement;
+					var hits = parsedResponse.GetProperty("hits").EnumerateArray();
+					recipes = hits.Select(hit => JsonSerializer.Deserialize<Recipe>(hit.GetProperty("recipe").GetRawText())).ToArray();
+
+				}
+			}
+
+
+
+		} 
+		StateHasChanged();
+	}
+		
+}

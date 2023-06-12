@@ -9,7 +9,8 @@
 @inject IJSRuntime JsRuntime
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<h2>Add Food</h2>
+<h2 class="align-content-lg-center ">Add Food</h2>
+<table class="table table-hover table-borderless">
 <div class="row">
     <div class="col-md-6">
         <div class="form-group">
@@ -29,6 +30,12 @@
             <input form="ExpirationDate" class="form-control" @bind="@food.ExpirationDate" />
         </div>
     </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="Cost"> Cost *</label>
+            <input form="Cost" class="form-control" @bind="@food.Cost" />
+        </div>
+    </div>
 </div>
 <div class="row">
     <div class="col-md-4">
@@ -38,6 +45,7 @@
         </div>
     </div>
 </div>
+</table>
 @code {
     GroceryViewModel food = new GroceryViewModel();
     private string userId;

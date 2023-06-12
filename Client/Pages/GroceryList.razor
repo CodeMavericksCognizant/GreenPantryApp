@@ -7,12 +7,26 @@
     <a href="/addfood"> Add New Food Item</a>
     @if (groceryList != null)
     {
-        <table class="table-bordered">
+        if (message.Length > 1)
+        {
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Expiring Soon</strong> 
+                <p>@message
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" @onclick="@ChangeThisState">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </p>
+            </div>
+        }
+        <table class="table table-sm table-hover table-borderless">
             <thead>
             <tr>
                 <th width = "40%">Grocery Item</th>
-                <th width = "30%">Purchase Date</th>
-                <th width = "30%">Expiration Date</th>
+                <th width = "20%">Purchase Date</th>
+                <th width = "20%">Expiration Date</th>
+                <th width="20%">Cost</th>
+
+
             </tr>
             </thead>
             <tbody>
@@ -24,10 +38,12 @@
                     </td>
                     <td>@p.PurchaseDate</td>
                     <td>@p.ExpirationDate</td>
+                        <td>@p.Cost.ToString("C2")</td>
                     <td>
                         <a href="/editfood/@p.Id">Edit</a> |
-                        <a href="/deletefood/@p.Id">Delete</a>
-                        <a href="/shoppinglist/@p.Id">Move to Shopping List</a>
+                            <a href="/deletefood/@p.Id">Delete</a> |
+                            <a href="/shoppinglist/@p.Id">Move to Shopping List</a> |
+                            <a href="/recipesearch/@p.Id">Search for Recipe</a>
                     </td>
                 </tr>
             }
@@ -37,13 +53,14 @@
 </div>
 @code {
     List<GroceryViewModel> groceryList = new List<GroceryViewModel>();
+    string message = "";
     protected override async Task OnInitializedAsync()
     {
         var response = await _httpClient.GetAsync("api/Foods");
         response.EnsureSuccessStatusCode();
         groceryList = await response.Content.ReadFromJsonAsync<List<GroceryViewModel>>();
         DateTime temp = DateTime.Now;
-        string message="";
+
         foreach(var g in groceryList)
         {
             var tempDays = (g.ExpirationDate-temp).Days;
@@ -57,6 +74,11 @@
         {
             await JsRuntime.InvokeVoidAsync("alert", message);
         }
+    }
+
+    private void ChangeThisState()
+    {
+        StateHasChanged();
     }
 
 

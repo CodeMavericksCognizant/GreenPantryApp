@@ -1,46 +1,73 @@
 ﻿@page "/receipt"
 @using System.IO
 @using Newtonsoft.Json
-@using Mindee
-@using Mindee.Parsing
+@using Newtonsoft.Json.Linq
+@using System.Net.Http.Headers
+@using System.Net.Http
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using GreenPantryApp.Shared
+@using System.Net
+@attribute [Authorize]
+@inject HttpClient _httpClient
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
 @inject IJSRuntime JsRuntime
 
-<h1>Receipt OCR</h1>
+<h1>Upload a Receipt</h1>
 
 <!-- Create an input element that allows users to select receipt images -->
-<InputFile accept="image/*" OnChange="@OnFileSelected" required />
+<InputFile accept="images/*" OnChange="@OnFileSelected" required />
 
 <!-- Create a button element that allows users to upload receipt images -->
 <button type="button" class="btn btn-primary" @onclick="OnFileUpload">Upload</button>
 
 <!-- Create a div that displays the extracted data from the receipt image -->
-<div id="result">
+<div>
      @if (result != null)
     {
-        <p>Yay</p>
-      
+        <h3>Items found</h3>
+        <table class="table-bordered">
+            <thead>
+                <tr>
+                    <th width = "80%">Grocery Item</th>
+                    <th width="20%">Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+   
+                @foreach (var lineItem in result)
+                {
+                    <tr>
+                        <td>
+                            @lineItem["description"].ToString()
+                        </td>
+                        <td>@lineItem["total_amount"].ToString("C2")</td>
+                        
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-primary" @onclick="AddAllItems">Add Items</button>
+
+
     }
 </div>
 
 @code {
-    private readonly string _apiKey = "f120c44f2a4223caad80a4cf96098978";
-
-
-    private MindeeClient _client;
-
-
+    private readonly string _apiKey = "f120c44f2a4223caad80a4cf96098978"; 
+    private string userId;
     private IBrowserFile file;
-
-
-    private dynamic result;
-
+    dynamic result;
+    private DateTime purchaseDate;
 
     private async void OnFileSelected(InputFileChangeEventArgs e)
     {
 
         file = e.File;
-        await JsRuntime.InvokeVoidAsync("alert", "Successful upload.");
+
     }
 
     // Define an async method that handles the file upload event
@@ -62,9 +89,10 @@
                 {
                     await file.OpenReadStream().CopyToAsync(stream);
                 }
-                await JsRuntime.InvokeVoidAsync("alert", "Copied.");
+                await JsRuntime.InvokeVoidAsync("alert", "Successful upload.");
+
                 // Call the Mindee Receipt OCR API with the file path
-                result = await CallMindeeReceiptOcrApi(filePath);
+                CallMindeeReceiptOcrApi(filePath);
                 // Trigger a UI update
                 StateHasChanged();
             }
@@ -72,7 +100,7 @@
             {
                 Console.WriteLine(exp.Message + " " + exp.StackTrace);
             }
-    }
+        }
         else
         {
             // Display an error message in an alert box
@@ -81,26 +109,78 @@
     }
 
     // Define an async method that calls the Mindee Receipt OCR API with a file path
-    private async Task<dynamic> CallMindeeReceiptOcrApi(string filePath)
+    private async void CallMindeeReceiptOcrApi(string filePath)
     {
 
-        MindeeClient mindeeClient = MindeeClientInit.Create(_apiKey);
+        using (var httpClient = new HttpClient())
+        {
+            using (var request = new HttpRequestMessage(new HttpMethod("POST"), "https://api.mindee.net/v1/products/mindee/expense_receipts/v5/predict"))
+            {
+                request.Headers.TryAddWithoutValidation("Authorization", "Token f120c44f2a4223caad80a4cf96098978");
 
-        CustomEndpoint myEndpoint = new CustomEndpoint(
-            endpointName: "expense_receipts",
-            accountName: "mindee",
-            version: "5.0"
-        );
+                var multipartContent = new MultipartFormDataContent();
+                multipartContent.Add(new ByteArrayContent(File.ReadAllBytes(filePath)), "document", Path.GetFileName(filePath));
+                request.Content = multipartContent;
 
-        var documentParsed = await mindeeClient
-            .LoadDocument(new FileInfo(filePath))
-            .ParseAsync(myEndpoint);
+                var response = await httpClient.SendAsync(request);
+                string temp = await response.Content.ReadAsStringAsync();
+                if (response != null)
+                {
 
-        Console.WriteLine(documentParsed.ToString());
-        
-        var result = JsonConvert.DeserializeObject<dynamic>(documentParsed.Inference.DocumentPrediction.ToString());
-        // Return the result object
-        return result;
+                    await JsRuntime.InvokeVoidAsync("alert", "Success. \nResults Loading");
+
+
+                    var parsedResponse = JObject.Parse(temp);
+                    var tempDate = parsedResponse["document"]["inference"]["prediction"]["date"]["value"].ToString();
+                    if(!String.IsNullOrEmpty(tempDate))
+                    {
+                        purchaseDate = DateTime.Parse(tempDate);
+                    }
+                    else
+                    {
+                        purchaseDate = DateTime.Now;
+                    }
+
+                    result = parsedResponse["document"]["inference"]["prediction"]["line_items"];
+                    
+                    StateHasChanged();
+
+                }
+
+
+            }
+        }
+    }
+    private async void AddAllItems()
+    {
+        foreach (var lineItem in result)
+        {
+            GroceryViewModel food = new GroceryViewModel();
+            food.UserId = userId;
+            food.GroceryItem = lineItem["description"].ToString();
+            food.PurchaseDate = purchaseDate;
+            food.ExpirationDate = purchaseDate.AddDays(14);
+            food.Cost = lineItem["total_amount"];
+            var response = await _httpClient.PostAsJsonAsync("api/Foods", @food);
+
+        }
+        NavigationManager.NavigateTo("groceryList");
+
 
     }
+  
+    
+    override protected async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider
+                    .GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            userId = user.Identity.Name;
+        }
+    }
+
+    
 }

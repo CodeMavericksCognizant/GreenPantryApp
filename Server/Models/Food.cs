@@ -14,6 +14,8 @@ namespace GreenPantryApp.Server.Models
         [Required] public string GroceryItem { get; set; }
         [Required] public DateTime PurchaseDate { get; set; }
         [Required] public DateTime ExpirationDate { get; set; }
-        
+        [Column(TypeName = "decimal(18,2)")]
+        [Required] public Decimal Cost { get; set; }
+
     }
 }

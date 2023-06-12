@@ -29,6 +29,7 @@ namespace GreenPantryApp.Server.Service
                 data.GroceryItem = food.GroceryItem;
                 data.PurchaseDate = food.PurchaseDate;
                 data.ExpirationDate = food.ExpirationDate;
+                data.Cost = food.Cost;
                 await _food.UpdateAsync(data);
                 return true;
             }

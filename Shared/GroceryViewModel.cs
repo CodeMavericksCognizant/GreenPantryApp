@@ -39,4 +39,10 @@ public class GroceryViewModel{
         get;
         set;
     }
+    [Required]
+    [Display(Name = "Cost")]
+    public Decimal Cost {
+        get; 
+        set; 
+    }
 }
