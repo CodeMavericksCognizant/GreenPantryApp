@@ -1,23 +1,16 @@
 ﻿@page "/grocerylist"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using GreenPantryApp.Shared
+@attribute [Authorize]
 @inject HttpClient _httpClient
 @inject IJSRuntime JsRuntime
 <h1>Grocery Detail</h1>
-<div>
+<div >
     <a href="/addfood"> Add New Food Item</a>
     @if (groceryList != null)
     {
-        if (message.Length > 1)
-        {
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <strong>Expiring Soon</strong> 
-                <p>@message
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close" @onclick="@ChangeThisState">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                </p>
-            </div>
-        }
+
         <table class="table table-sm table-hover table-borderless">
             <thead>
             <tr>
@@ -42,7 +35,7 @@
                     <td>
                         <a href="/editfood/@p.Id">Edit</a> |
                             <a href="/deletefood/@p.Id">Delete</a> |
-                            <a href="/shoppinglist/@p.Id">Move to Shopping List</a> |
+                            <a href="/addlist/@p.GroceryItem">Move to Shopping List</a> |
                             <a href="/recipesearch/@p.Id">Search for Recipe</a>
                     </td>
                 </tr>

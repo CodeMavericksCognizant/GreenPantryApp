@@ -4,6 +4,11 @@ html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+h1, h2, h3 {
+    color: darkgreen;
+    align-items: center;
+}
+
 h1:focus {
     outline: none;
 }
@@ -12,10 +17,10 @@ a, .btn-link {
     color: #0071c1;
 }
 
-.btn-primary {
+.btn {
     color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    background-color: #00cc00;
+    border-color: #006600;
 }
 
 .content {

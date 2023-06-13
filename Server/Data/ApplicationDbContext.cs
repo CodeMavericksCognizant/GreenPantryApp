@@ -15,5 +15,6 @@ namespace GreenPantryApp.Server.Data
         {
         }
         public DbSet<Food> Foods { get; set; }
+        public DbSet<ShoppingList> ShoppingLists { get; set; }
     }
 }

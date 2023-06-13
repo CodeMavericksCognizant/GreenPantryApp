@@ -8,8 +8,24 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
 @inject AuthenticationStateProvider AuthenticationStateProvider
+<style>
+	.container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
 
-<h2 class="align-content-lg-center ">Add Food</h2>
+
+
+	hr {
+		border: none;
+		height: 5px;
+		background-color: darkgreen;
+		margin: 20px 0;
+	}
+</style>
+<div class="container">
+<h2 >Add Food</h2>
 <table class="table table-hover table-borderless">
 <div class="row">
     <div class="col-md-6">
@@ -40,12 +56,13 @@
 <div class="row">
     <div class="col-md-4">
         <div class="form-group">
-            <input type="button" class="btn btn-primary" @onclick="@Save" value="Save" />
-            <input type="button" class="btn" @onclick="@Cancel" value="Cancel" />
+                <input type="button" class="btn btn-outline-dark display-7" @onclick="@Save" value="Save" />
+                <input type="button" class="btn  btn-warning" @onclick="@Cancel" value="Cancel" />
         </div>
     </div>
 </div>
 </table>
+</div>
 @code {
     GroceryViewModel food = new GroceryViewModel();
     private string userId;

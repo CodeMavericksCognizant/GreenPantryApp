@@ -1,0 +1,46 @@
+﻿@page "/editlist/{Id}"
+@using GreenPantryApp.Shared
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+
+<h2>Edit Food Name</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="FoodName"> Food Item *</label>
+            <input form="FoodName" class="form-control" @bind="@food.FoodName" />
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <input type="button" class="btn " @onclick="@Save" value="Save" />
+            <input type="button" class="btn btn-warning" @onclick="@Cancel" value="Cancel" />
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    ShoppingListModel food = new ShoppingListModel();
+    protected override async Task OnInitializedAsync()
+    {
+        food = await Http.GetFromJsonAsync<ShoppingListModel>("api/ShoppingLists/" + Id);
+    }
+    protected async Task Save()
+    {
+        var response = await Http.PutAsJsonAsync("api/ShoppingLists/" + Id, @food);
+        bool foodResponse = await response.Content.ReadFromJsonAsync<bool>();
+        if (foodResponse)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Updated Successfully!");
+            NavigationManager.NavigateTo("shoppinglist");
+        }
+    }
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("shoppinglist");
+    }
+}

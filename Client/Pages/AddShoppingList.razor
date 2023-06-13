@@ -1,0 +1,109 @@
+﻿@page "/addlist/{name?}"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using GreenPantryApp.Shared
+@using System.Net
+@attribute [Authorize]
+@inject HttpClient _httpClient
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@inject AuthenticationStateProvider AuthenticationStateProvider
+<style>
+	.container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+
+
+	hr {
+		border: none;
+		height: 5px;
+		background-color: darkgreen;
+		margin: 20px 0;
+	}
+</style>
+<div class="container">
+<h2 class="align-content-lg-center ">Add Food to Shopping List</h2>
+        @if (String.IsNullOrEmpty(Name))
+        {
+        <table class="table table-hover table-borderless">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="FoodName"> Food Item *</label>
+                        <input form="FoodName" class="form-control" @bind="@food.FoodName" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <input type="button" class="btn" @onclick="@Save" value="Save" />
+                        <input type="button" class="btn" @onclick="@Cancel" value="Cancel" />
+                    </div>
+                </div>
+            </div>
+        </table>
+
+
+                }
+        else{
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                <p> Adding <b>@Name</b></p>
+                </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <input type="button" class="btn btn-outline-dark" @onclick="@Save" value="Save" />
+                        <input type="button" class="btn btn-warning" @onclick="@Cancel" value="Cancel" />
+                    </div>
+                </div>
+            </div>
+        }
+
+</div>
+@code {
+    [Parameter]
+    public string? Name { get; set; }
+    ShoppingListModel food = new ShoppingListModel();
+    private string userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider
+            .GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            userId = user.Identity.Name;
+        }
+    }
+    protected async Task Save()
+    {
+        if (!String.IsNullOrEmpty(Name))
+        {
+            food.FoodName = Name;
+        }
+        food.UserId = userId;
+        var response = await _httpClient.PostAsJsonAsync("api/ShoppingLists", @food);
+        ShoppingListModel listResponse = await response.Content.ReadFromJsonAsync<ShoppingListModel>() ?? throw new InvalidOperationException();
+        if (listResponse?.Id > 0)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Saved Successfully!");
+            NavigationManager.NavigateTo("shoppinglist");
+        }
+    }
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("shoppinglist");
+    }
+
+}

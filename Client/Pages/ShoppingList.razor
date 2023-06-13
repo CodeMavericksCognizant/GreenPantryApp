@@ -1,19 +1,56 @@
-﻿@page "/shoppinglist/{id?}"
+﻿@page "/shoppinglist"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using GreenPantryApp.Shared
+@using System.Net
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient _httpClient
 @inject IJSRuntime JsRuntime
 <h3>Shopping List</h3>
 
+<div>
+    <a href="/addlist"> Add New Item to Shopping List</a>
+    @if (shoppingList != null)
+    {
 
-@if (!String.IsNullOrEmpty(Id))
-{
-    
-}
+        
+        <table class="table table-sm table-hover table-borderless">
+
+            <tbody>
+                @foreach (var p in shoppingList)
+                {
+                    <tr>
+                        <td>
+                            @p.FoodName
+                        </td>
+
+                        <td>
+                            <a href="/editlist/@p.Id">Edit</a> |
+                            <a href="/deletelist/@p.Id">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
 @code {
-    [Parameter]
-    public string? Id { get; set; }
-    protected override void OnInitialized()
+    List<ShoppingListModel> shoppingList = new List<ShoppingListModel>();
+    protected override async Task OnInitializedAsync()
     {
         
+        var response = await _httpClient.GetAsync("api/ShoppingLists");
+        response.EnsureSuccessStatusCode();
+        shoppingList = await response.Content.ReadFromJsonAsync<List<ShoppingListModel>>();
+
+
     }
+
+
+
+
 }
+
+
